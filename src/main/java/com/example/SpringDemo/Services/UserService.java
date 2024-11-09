@@ -42,4 +42,11 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
+    public void updateProficiencyLevel(Long userId, String proficiencyLevel) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setProficiencyLevel(proficiencyLevel);
+        userRepository.save(user);  // Just save the updated user, no return needed
+    }
+
 }
