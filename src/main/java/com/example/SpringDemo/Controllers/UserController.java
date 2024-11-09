@@ -48,6 +48,8 @@ public class UserController {
         userService.updateProficiencyLevel(id, newLevel);
         return ResponseEntity.ok("Proficiency level updated successfully");
     }
+
+
 }
 
 

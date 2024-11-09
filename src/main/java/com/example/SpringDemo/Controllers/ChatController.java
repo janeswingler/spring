@@ -32,6 +32,11 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/conversation/{id}/feedback")
+    public ResponseEntity<String> getConversationFeedback(@PathVariable Long id) {
+        String feedback = chatService.generateReviewSummary(id);
+        return ResponseEntity.ok(feedback);
+    }
 
     @PostMapping("/message")
     public ResponseEntity<ChatMessage> sendMessage(@RequestBody Map<String, Object> payload) {

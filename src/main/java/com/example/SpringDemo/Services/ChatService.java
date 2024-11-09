@@ -154,6 +154,20 @@ public class ChatService {
     }
 
 
+    public String generateReviewSummary(Long conversationId) {
+        // Retrieve the conversation content
+        var conversation = conversationRepository.findById(Math.toIntExact(conversationId))
+                .orElseThrow(() -> new RuntimeException("Conversation not found"));
+
+        String conversationContent = conversation.getConversationContent();
+
+        // Use the assistant to generate a simple feedback summary
+        String prompt = "Provide a short feedback summary for the student based on the following conversation. " +
+                "Identify areas for improvement and any new vocabulary introduced. Here is the conversation content:\n" +
+                conversationContent;
+
+        return assistant.chat(prompt);
+    }
 
 
 
