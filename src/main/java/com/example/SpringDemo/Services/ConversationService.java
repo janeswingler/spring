@@ -27,14 +27,12 @@ public class ConversationService {
     }
 
     public Conversation saveConversation(Conversation conversation) {
-        // Fetch the user based on the provided user ID
+
         User user = userRepository.findById(conversation.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Set the user for the conversation
         conversation.setUser(user);
 
-        // Save and return the conversation
         return conversationRepository.save(conversation);
     }
 

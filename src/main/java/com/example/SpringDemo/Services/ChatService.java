@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//added static
+
 
 @Service
 public class ChatService {
@@ -97,25 +97,19 @@ public class ChatService {
         var conversation = conversationRepository.findById(Math.toIntExact(conversationId))
                 .orElseThrow(() -> new RuntimeException("Conversation not found"));
 
-//        String prompt = "Provide an array of 5 words for the student to study that are relevant to this conversation. Following each word, provide a brief definition and an example usage.";
         String prompt = "Provide an array of 5 words for the student to study that are relevant to this conversation. For each word, please provide it in the following format:\n\n[Number]. [Term] ([Translation]) - Definition: [Definition] Example: [Example Usage] ([Translation])";
 
-        // Use the AI assistant to generate the words
         String response = assistant.chat(prompt);
 
-        // Create a flashcard pack and associate it with the conversation
         FlashcardPack flashcardPack = new FlashcardPack();
         flashcardPack.setConversation(conversation);
         flashcardPack.setName("Flashcards from Conversation " + conversationId);
         flashcardPackRepository.save(flashcardPack);
 
-        // Parse the response and create flashcards
         List<Flashcard> flashcards = parseAndCreateFlashcards(response, flashcardPack);
 
-        // Save flashcards to the repository
         flashcardRepository.saveAll(flashcards);
 
-        // Optionally, update the conversation with the recommended words
         conversation.setRecommendedWords(response);
         conversationRepository.save(conversation);
 
@@ -127,7 +121,6 @@ public class ChatService {
     private List<Flashcard> parseAndCreateFlashcards(String response, FlashcardPack flashcardPack) {
         List<Flashcard> flashcards = new ArrayList<>();
 
-        // Adjusted regex pattern to match all entries in the response
         Pattern pattern = Pattern.compile(
                 "(\\d+)\\.\\s*(.*?)\\s*(?:\\((.*?)\\))?\\s*-\\s*Definition:\\s*(.*?)\\s*Example:\\s*(.*?)(?=\\n\\d+\\.|$)",
                 Pattern.DOTALL
@@ -146,7 +139,7 @@ public class ChatService {
             flashcard.setTranslation(translation);
             flashcard.setDefinition(definition);
             flashcard.setExampleUsage(exampleUsage);
-            flashcard.setFlashcardPack(flashcardPack); // Associate with flashcard pack
+            flashcard.setFlashcardPack(flashcardPack);
             flashcards.add(flashcard);
         }
 
@@ -155,13 +148,12 @@ public class ChatService {
 
 
     public String generateReviewSummary(Long conversationId) {
-        // Retrieve the conversation content
+
         var conversation = conversationRepository.findById(Math.toIntExact(conversationId))
                 .orElseThrow(() -> new RuntimeException("Conversation not found"));
 
         String conversationContent = conversation.getConversationContent();
 
-        // Use the assistant to generate a simple feedback summary
         String prompt = "Provide a short feedback summary for the student based on the following conversation. " +
                 "Identify areas for improvement and any new vocabulary introduced. Here is the conversation content:\n" +
                 conversationContent;
@@ -169,111 +161,30 @@ public class ChatService {
         return assistant.chat(prompt);
     }
 
-
-
-    //before adding flashcards WORKS AS OF 10/18 12:40pm
-//    public String generateStudyWords(Long conversationId) {
-//        var conversation = conversationRepository.findById(Math.toIntExact(conversationId))
-//                .orElseThrow(() -> new RuntimeException("Conversation not found"));
-//
-//        String conversationContent = conversation.getConversationContent();
-//        String prompt = "Provide an array of 5 words for the student to study that are relevant to this conversation. Following each word, provide a brief definition and and an example usage";
-//
-//        // Use the AI assistant to generate the words
-//        String response = assistant.chat(prompt);
-//
-//        // Assuming the response is a comma-separated string of words like "word1,word2,word3,word4,word5"
-//        return response;
-//    }
-
-
     public List<ChatMessage> getChatHistory(Long conversationId) {
         return chatMessageRepository.findByConversationId(conversationId);
     }
 
     public ChatMessage chatWithOpenAi(String userMessage, Long userId) {
-        // Fetch user details for proficiency and language
+
         User user = userRepository.findById((long) Math.toIntExact(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
         String proficiencyLevel = user.getProficiencyLevel();
         String language = user.getLanguagesToLearn();
 
-        // Create the initial AI prompt for generating a response in the target language
         String prompt = "You are a " + language + " tutor for a " + proficiencyLevel +
                 " student. Respond in simple " + language +
                 " that a " + proficiencyLevel + " student can understand. Here is the student's message: \"" + userMessage + "\"";
 
-        // Generate the AI's response
         String aiResponse = assistant.chat(prompt);
 
-        // Now ask the AI to translate its response into English
         String translationPrompt = "Translate the following " + language + " text into English: \"" + aiResponse + "\"";
         String translatedResponse = assistant.chat(translationPrompt);
 
-        // Create a ChatMessage object with both the original AI response and its translation
         ChatMessage aiMessage = new ChatMessage("Language Teacher", aiResponse, translatedResponse, new Date());
 
         return aiMessage;
     }
-
-
-
-    //////BEFORE TOOLTIP TRANSLATION////
-//    public String chatWithOpenAi(String userMessage, Long userId) {
-//        var user = userRepository.findById(Math.toIntExact(userId))
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Log user details for debugging
-//        System.out.println("User ID: " + userId);
-//        System.out.println("Languages to Learn: " + user.getLanguagesToLearn());
-//        System.out.println("Proficiency Level: " + user.getProficiencyLevel());
-//
-//        String language = user.getLanguagesToLearn();
-//        String proficiencyLevel = user.getProficiencyLevel();
-//
-//        // Construct the prompt
-//        String prompt = "You are a " + language + " tutor for a " + proficiencyLevel +
-//                " student. Respond in simple " + language +
-//                " that a " + proficiencyLevel + " student can understand. Here is the student's message: \"" + userMessage + "\"";
-//
-//        System.out.println("Prompt: " + prompt);
-//
-//        // Send the prompt to the assistant
-//        String response = assistant.chat(prompt);
-//
-//        System.out.println("AI Response: " + response);
-//
-//        return response;
-//    }
-    ///////////////////////////
-
-//    public String chatWithOpenAi(String userMessage, Long userId) {
-//        // Retrieve user details based on userId
-//        var user = userRepository.findById(Math.toIntExact(userId))
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        String language = user.getLanguagesToLearn(); // E.g., "Spanish", "Afrikaans", "French"
-//        String proficiencyLevel = user.getProficiencyLevel(); // E.g., "Beginner", "Intermediate", "Advanced"
-//
-//        String prompt = "You are a " + language + " tutor for a " + proficiencyLevel +
-//                " student. Respond in simple " + language +
-//                " that a " + proficiencyLevel + " student can understand. Here is the student's message: \"" + userMessage + "\"";
-//
-//        return assistant.chat(prompt);
-//    }
-
-
-    // Made the following changes:
-    // - added proficiencyLevel field
-//    public String chatWithOpenAi(String userMessage, String proficiencyLevel) {
-//
-//        String prompt = "You are a Spanish tutor for a " + proficiencyLevel +
-//                " student. Respond in simple Spanish that a " + proficiencyLevel +
-//                " student can understand. Here is the student's message: \"" + userMessage + "\"";
-//
-//
-//        return assistant.chat(prompt);
-//    }
 
     public Flux<String> chatStream(String message) {
         Sinks.Many<String> sink = Sinks.many().unicast().onBackpressureBuffer();

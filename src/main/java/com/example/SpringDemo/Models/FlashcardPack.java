@@ -33,10 +33,8 @@ public class FlashcardPack {
 
     public FlashcardPack() {
         this.createdAt = LocalDateTime.now();
-        this.flashcards = new HashSet<>(); // Initialize flashcards set
+        this.flashcards = new HashSet<>();
     }
-
-    // Getters and Setters for all fields
 
     public boolean isCompleted() {
         return completed;

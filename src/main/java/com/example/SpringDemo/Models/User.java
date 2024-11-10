@@ -20,9 +20,6 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    //@Column(unique = true, nullable = true, length = 100)
-    //private String email;
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -33,7 +30,7 @@ public class User {
     private String languagesToLearn;
 
     @Column(name = "proficiency_level")
-    private String proficiencyLevel; // E.g., "Beginner", "Intermediate", "Advanced"
+    private String proficiencyLevel;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

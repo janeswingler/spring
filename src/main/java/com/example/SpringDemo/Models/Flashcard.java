@@ -27,7 +27,6 @@ public class Flashcard {
     @Column(name = "example_usage", columnDefinition = "TEXT")
     private String exampleUsage;
 
-    // Getters and Setters for all fields
 
     public Long getId() {
         return id;

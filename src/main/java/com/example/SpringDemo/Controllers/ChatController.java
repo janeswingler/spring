@@ -21,7 +21,7 @@ public class ChatController {
 
     public ChatController(ChatService chatService, ConversationRepository conversationRepository) {
         this.chatService = chatService;
-        this.conversationRepository = conversationRepository; // Inject the repository
+        this.conversationRepository = conversationRepository;
     }
 
     @PostMapping("/new")
@@ -43,94 +43,32 @@ public class ChatController {
         Long conversationId = ((Number) payload.get("conversationId")).longValue();
         String messageText = (String) payload.get("messageText");
 
-        // Get the user ID associated with the conversation
         Conversation conversation = conversationRepository.findById(Math.toIntExact(conversationId))
                 .orElseThrow(() -> new RuntimeException("Conversation not found"));
         Long userId = conversation.getUser().getId();
 
-        // Save the user's message first
         ChatMessage savedUserMessage = chatService.saveMessage(conversationId, messageText, null);
 
 
-        // Get the AI's response and its translation
         ChatMessage aiMessage = chatService.chatWithOpenAi(messageText, userId);
 
-        // Save the AI's response and translation in the same conversation
         chatService.saveMessage(conversationId, aiMessage.getText(), aiMessage.getTranslation());
 
         return ResponseEntity.ok(aiMessage);
     }
 
-
-
-
-
-    ////////BEFORE TRANSLATION TOOLTIP//////////////
-//    @PostMapping("/message")
-//    public ResponseEntity<ChatMessage> sendMessage(@RequestBody Map<String, Object> payload) {
-//        Long conversationId = ((Number) payload.get("conversationId")).longValue();
-//        String messageText = (String) payload.get("messageText");
-//
-//        // Get the user ID associated with the conversation
-//        Conversation conversation = conversationRepository.findById(Math.toIntExact(conversationId))
-//                .orElseThrow(() -> new RuntimeException("Conversation not found"));
-//        Long userId = Long.valueOf(conversation.getUser().getId());
-//
-//        // Save the user's message first
-//        ChatMessage savedUserMessage = chatService.saveMessage(conversationId, messageText);
-//
-//        // Get the response from the OpenAI model with user details
-//        String botResponse = chatService.chatWithOpenAi(messageText, userId);
-//
-//        // Save the bot's response in the same conversation
-//        ChatMessage botMessage = chatService.saveMessage(conversationId, botResponse);
-//
-//        return ResponseEntity.ok(botMessage);
-//    }
-
-////////////////////////////////
-
-//    @PostMapping("/message")
-//    public ResponseEntity<ChatMessage> sendMessage(@RequestBody Map<String, Object> payload) {
-//        Long conversationId = ((Number) payload.get("conversationId")).longValue();
-//        String messageText = (String) payload.get("messageText");
-//
-//        // Save the user's message first
-//        ChatMessage savedUserMessage = chatService.saveMessage(conversationId, messageText);
-//
-//        // Get the response from the OpenAI model
-//        String botResponse = chatService.chatWithOpenAi(messageText, "beginner");
-//
-//        // Save the bot's response in the same conversation
-//        ChatMessage botMessage = chatService.saveMessage(conversationId, botResponse);
-//
-//        return ResponseEntity.ok(botMessage);
-//    }
-
-//    @PostMapping("/message")
-//    public ResponseEntity<ChatMessage> sendMessage(@RequestBody Map<String, Object> payload) {
-//        Long conversationId = ((Number) payload.get("conversationId")).longValue();
-//        String messageText = (String) payload.get("messageText");
-//        ChatMessage savedMessage = chatService.saveMessage(conversationId, messageText);
-//        return ResponseEntity.ok(savedMessage);
-//    }
-
     @PostMapping("/end")
     public ResponseEntity<Map<String, Object>> endConversation(@RequestBody Map<String, Object> payload) {
         long conversationId = ((Number) payload.get("conversationId")).longValue();
 
-        // Fetch the conversation
         var conversation = conversationRepository.findById(Math.toIntExact(conversationId))
                 .orElseThrow(() -> new RuntimeException("Conversation not found"));
 
-        // Generate study words
         String recommendedWords = chatService.generateStudyWords(conversationId);
 
-        // Update the conversation with recommended words
         conversation.setRecommendedWords(recommendedWords);
         conversationRepository.save(conversation);
 
-        // Return the words to the frontend
         Map<String, Object> response = new HashMap<>();
         response.put("recommendedWords", recommendedWords.split(","));
         return ResponseEntity.ok(response);
@@ -149,17 +87,9 @@ public class ChatController {
         String userMessage = (String) payload.get("messageText");
         Long userId = ((Number) payload.get("userId")).longValue();
 
-        // Get the response from the chat service using the user's message and ID.
         String response = String.valueOf(chatService.chatWithOpenAi(userMessage, userId));
         return ResponseEntity.ok(response);
     }
 
-
-//    @PostMapping("/openai")
-//    public ResponseEntity<String> chatWithOpenAi(@RequestBody Map<String, String> payload) {
-//        String userMessage = payload.get("messageText");
-//        String response = chatService.chatWithOpenAi(userMessage, "beginner");
-//        return ResponseEntity.ok(response);
-//    }
 }
 

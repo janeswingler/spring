@@ -67,30 +67,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-
-//    @PostMapping("/register")
-//    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> request) {
-//        String username = request.get("username");
-//        String rawPassword = request.get("password");
-//        if ( userRepository.findByUsername(username) != null) {
-//            Map<String, String> response = new HashMap<>();
-//            response.put("message", "Username already exists");
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-//        }
-//
-//        String encodedPassword = passwordEncoder.encode(rawPassword);
-//
-//        User user = new User();
-//        user.setUsername(username);
-//        user.setPassword(encodedPassword);
-//        userRepository.save(user);
-//
-//        Map<String, String> response = new HashMap<>();
-//        response.put("message", "User registered successfully");
-//
-//        return ResponseEntity.ok(response);
-//    }
-
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
@@ -120,7 +96,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout() {
-        // For JWT, logout can be handled client-side by deleting the token
         Map<String, String> response = new HashMap<>();
         response.put("message", "User logged out successfully");
         return ResponseEntity.ok(response);

@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setProficiencyLevel(proficiencyLevel);
-        userRepository.save(user);  // Just save the updated user, no return needed
+        userRepository.save(user);
     }
 
 }

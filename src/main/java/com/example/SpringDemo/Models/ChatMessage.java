@@ -19,7 +19,7 @@ public class ChatMessage {
     private String text;
 
     @Column(columnDefinition = "TEXT")
-    private String translation; // Add this field for storing the translation
+    private String translation;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;

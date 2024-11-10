@@ -13,12 +13,6 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class FlashcardPackController {
 
-//    @Autowired
-//    private FlashcardPackService flashcardPackService;
-
-
-
-
     private final FlashcardPackService flashcardPackService;
 
     public FlashcardPackController(FlashcardPackService flashcardPackService) {
